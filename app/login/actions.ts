@@ -30,8 +30,13 @@ export async function handleForm(prevState: unknown, formData: FormData) {
 
   const result = formSchema.safeParse(data);
   if (!result.success) {
-    return result.error.flatten();
+    return {
+      success: false,
+      errors: result.error.flatten(),
+    };
   } else {
-    console.log(result.data);
+    return {
+      success: true,
+    };
   }
 }
