@@ -4,8 +4,8 @@ interface FormInputProps {
   type: string;
   placeholder: string;
   required: boolean;
-  errors: string[];
   name: string;
+  errors?: string[];
   icon?: ComponentType<SVGProps<SVGSVGElement>>;
 }
 
@@ -31,7 +31,7 @@ export default function FormInput({
           required={required}
         />
       </div>
-      {errors.map((error, index) => (
+      {errors?.map((error, index) => (
         <span key={index} className="text-red-500 font-medium">
           {error}
         </span>

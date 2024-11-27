@@ -10,12 +10,10 @@ import {
   KeyIcon,
   UserIcon,
 } from "@heroicons/react/16/solid";
+import Toast from "@/components/toast";
 
 export default function LogIn() {
-  const [state, action] = useActionState(handleForm, {
-    data: null,
-    errors: [],
-  });
+  const [state, action] = useActionState(handleForm, null);
 
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
@@ -26,7 +24,7 @@ export default function LogIn() {
           type="email"
           placeholder="Email"
           required
-          errors={[]}
+          errors={state?.errors?.fieldErrors.email}
           icon={EnvelopeIcon}
         />
         <FormInput
@@ -34,7 +32,7 @@ export default function LogIn() {
           type="text"
           placeholder="Username"
           required
-          errors={[]}
+          errors={state?.errors?.fieldErrors.username}
           icon={UserIcon}
         />
         <FormInput
@@ -42,12 +40,12 @@ export default function LogIn() {
           type="password"
           placeholder="Password"
           required
-          errors={state?.errors ?? []}
+          errors={state?.errors?.fieldErrors.password}
           icon={KeyIcon}
         />
         <FormButton text="Log in" />
       </form>
-      {state?.data && <div>로그인 성공 !</div>}
+      {state?.success && <Toast text="Welcome back!" />}
     </div>
   );
 }
