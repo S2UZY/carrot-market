@@ -12,10 +12,7 @@ import {
 } from "@heroicons/react/16/solid";
 
 export default function LogIn() {
-  const [state, action] = useActionState(handleForm, {
-    data: null,
-    errors: [],
-  });
+  const [state, action] = useActionState(handleForm, null);
 
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
@@ -26,7 +23,7 @@ export default function LogIn() {
           type="email"
           placeholder="Email"
           required
-          errors={[]}
+          errors={state?.fieldErrors.email}
           icon={EnvelopeIcon}
         />
         <FormInput
@@ -34,7 +31,7 @@ export default function LogIn() {
           type="text"
           placeholder="Username"
           required
-          errors={[]}
+          errors={state?.fieldErrors.username}
           icon={UserIcon}
         />
         <FormInput
@@ -42,12 +39,11 @@ export default function LogIn() {
           type="password"
           placeholder="Password"
           required
-          errors={state?.errors ?? []}
+          errors={state?.fieldErrors.password}
           icon={KeyIcon}
         />
         <FormButton text="Log in" />
       </form>
-      {state?.data && <div>로그인 성공 !</div>}
     </div>
   );
 }
