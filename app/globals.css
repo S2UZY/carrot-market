@@ -12,3 +12,9 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer components {
+  .primary-btn {
+    @apply w-full bg-red-400 text-white  font-medium  rounded-md text-center hover:bg-red-300 transition-colors;
+  }
+}
