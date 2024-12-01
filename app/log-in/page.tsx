@@ -3,17 +3,16 @@
 import { useActionState } from "react";
 import FormInput from "@/components/form-input";
 import FormButton from "@/components/form-button";
-import { handleForm } from "./actions";
+import { logIn } from "./actions";
 import {
   EnvelopeIcon,
   FireIcon,
   KeyIcon,
   UserIcon,
 } from "@heroicons/react/16/solid";
-import Toast from "@/components/toast";
 
 export default function LogIn() {
-  const [state, action] = useActionState(handleForm, null);
+  const [state, action] = useActionState(logIn, null);
 
   return (
     <div className="flex flex-col gap-10 py-8 px-6">
@@ -24,7 +23,7 @@ export default function LogIn() {
           type="email"
           placeholder="Email"
           required
-          errors={state?.errors?.fieldErrors.email}
+          errors={state?.fieldErrors.email}
           icon={EnvelopeIcon}
         />
         <FormInput
@@ -32,7 +31,7 @@ export default function LogIn() {
           type="text"
           placeholder="Username"
           required
-          errors={state?.errors?.fieldErrors.username}
+          errors={state?.fieldErrors.username}
           icon={UserIcon}
         />
         <FormInput
@@ -40,12 +39,11 @@ export default function LogIn() {
           type="password"
           placeholder="Password"
           required
-          errors={state?.errors?.fieldErrors.password}
+          errors={state?.fieldErrors.password}
           icon={KeyIcon}
         />
         <FormButton text="Log in" />
       </form>
-      {state?.success && <Toast text="Welcome back!" />}
     </div>
   );
 }
