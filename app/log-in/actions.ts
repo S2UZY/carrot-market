@@ -1,7 +1,11 @@
 "use server";
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR,
+  USERNAME_MIN_LENGTH,
+} from "@/lib/constants";
 import { z } from "zod";
-
-const hasNumberRegex = new RegExp(/\d+/);
 
 const formSchema = z.object({
   email: z
@@ -11,14 +15,19 @@ const formSchema = z.object({
       (email) => email.includes("@zod.com"),
       "Only @zod.com emails are allowed."
     ),
-  username: z.string().min(5, "Username should be at least 5 characters long."),
+  username: z
+    .string()
+    .min(
+      USERNAME_MIN_LENGTH,
+      `Username should be at least ${USERNAME_MIN_LENGTH} characters long.`
+    ),
   password: z
     .string()
-    .min(10, "Password should be at least 5 characters long.")
-    .regex(
-      hasNumberRegex,
-      "Password should contain at least one number (123456789)"
-    ),
+    .min(
+      PASSWORD_MIN_LENGTH,
+      `Password should be at least ${PASSWORD_MIN_LENGTH} characters long.`
+    )
+    .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
 });
 
 export async function handleForm(prevState: unknown, formData: FormData) {
