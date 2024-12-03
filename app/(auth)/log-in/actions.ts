@@ -108,6 +108,6 @@ export async function logIn(prevState: unknown, formData: FormData) {
     const id = await getUserId(data.email as string);
     session.id = id;
     await session.save();
-    redirect("/profile");
+    redirect("/");
   }
 }
