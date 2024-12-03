@@ -21,13 +21,14 @@ model User{
 
 model Tweet{
   id Int @id @default(autoincrement())
+  tweet String @default("")
   create_at DateTime @default(now())
   update_at DateTime @updatedAt
   user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
   Like Like[]
 
-    @@index([userId])
+  @@index([userId])
 }
 
 model Like{
