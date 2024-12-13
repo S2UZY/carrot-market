@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { InitialTweets } from "@/app/page";
-import { getMoreTweets } from "@/app/tweets/action";
+import { InitialTweets } from "@/app/(tabs)/page";
+import { getMoreTweets } from "@/app/(tabs)/tweets/action";
 import ListTweet from "./list-tweet";
 
 interface TweetListProps {
