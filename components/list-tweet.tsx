@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
-interface ListProductProps {
+interface ListTweetProps {
   tweet: string;
   id: number;
   create_at: Date;
@@ -26,7 +26,7 @@ export default function ListTweet({
   id,
   create_at,
   user,
-}: ListProductProps) {
+}: ListTweetProps) {
   return (
     <Link
       href={`/tweets/${id}`}
@@ -42,7 +42,7 @@ export default function ListTweet({
         <div className="flex items-center space-x-2 mb-1">
           <span className="font-semibold text-gray-900">{user.username}</span>
           <span className="text-gray-500 text-sm">
-            {formatToTimeAgo(create_at.toISOString())}
+            {formatToTimeAgo(create_at.toString())}
           </span>
         </div>
         <p className="text-gray-800 text-sm leading-relaxed">{tweet}</p>
