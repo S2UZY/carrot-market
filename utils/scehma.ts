@@ -16,15 +16,7 @@ export const commentSchema = z.object({
 
 export const profileUpdateSchema = z
   .object({
-    email: z
-      .string()
-      .email()
-      .toLowerCase()
-      .trim()
-      .refine(
-        (email) => email.includes("@zod.com"),
-        "Only @zod.com emails are allowed."
-      ),
+    email: z.string().email().toLowerCase().trim(),
     username: z
       .string()
       .toLowerCase()
