@@ -6,7 +6,7 @@ Next.js, Prisma, Tailwind CSS를 사용하여 개발된 풀스택 소셜 미디�
 
 ## 🤖 Deploy
 
-[carrot-market-woad.vercel.app](carrot-market-woad.vercel.app)
+[[carrot-market-woad.vercel.app](https://carrot-market-woad.vercel.app)
 
 ## 📸 Preview
 
