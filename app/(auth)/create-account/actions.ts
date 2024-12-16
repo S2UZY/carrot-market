@@ -30,6 +30,10 @@ const formSchema = z
       .min(
         USERNAME_MIN_LENGTH,
         `Username should be at least ${USERNAME_MIN_LENGTH} characters long.`
+      )
+      .regex(
+        /^[a-zA-Z]+$/,
+        "Username should contain only English letters (A-Z, a-z)"
       ),
     password: z
       .string()

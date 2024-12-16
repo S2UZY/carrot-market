@@ -32,6 +32,10 @@ export const profileUpdateSchema = z
       .min(
         USERNAME_MIN_LENGTH,
         `Username should be at least ${USERNAME_MIN_LENGTH} characters long.`
+      )
+      .regex(
+        /^[a-zA-Z]+$/,
+        "Username should contain only English letters (A-Z, a-z)"
       ),
     bio: z.string().max(160, "Bio must be 160 characters or less").optional(),
   })
