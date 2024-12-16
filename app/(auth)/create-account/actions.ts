@@ -10,14 +10,7 @@ import db from "@/lib/db";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import getSession from "@/lib/session";
-
-const checkPasswords = ({
-  password,
-  confirm_password,
-}: {
-  password: string;
-  confirm_password: string;
-}) => password === confirm_password;
+import { checkPasswords } from "@/utils/scehma";
 
 const formSchema = z
   .object({
