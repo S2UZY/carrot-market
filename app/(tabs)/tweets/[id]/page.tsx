@@ -1,48 +1,138 @@
 import { formatToTimeAgo } from "@/lib/utils";
-import Link from "next/link";
-import {
-  ArrowLeftIcon,
-  ChatBubbleLeftIcon,
-  HeartIcon,
-} from "@heroicons/react/24/outline";
+import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import db from "@/lib/db";
 import { notFound } from "next/navigation";
+import { unstable_cache as nextCache } from "next/cache";
+import getSession from "@/lib/session";
+import LikeButton from "@/components/like-button";
+import { CommentList } from "@/components/comment-list";
+import { Prisma } from "@prisma/client";
+import Header from "@/components/header";
 
 interface TweetDetailProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function getTweet(id: number) {
-  const tweet = await db.tweet.findUnique({
+  const tweet = await db.tweet.update({
     where: {
       id,
     },
-    select: {
-      user: true,
-      tweet: true,
-      create_at: true,
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+    include: {
+      user: {
+        select: {
+          username: true,
+          id: true,
+        },
+      },
+      _count: {
+        select: {
+          likes: true,
+        },
+      },
     },
   });
-
-  if (!tweet) notFound();
 
   return tweet;
 }
 
+async function getComments(tweetId: number) {
+  try {
+    const comments = await db.comment.findMany({
+      where: { tweetId },
+      include: {
+        user: {
+          select: {
+            username: true,
+            id: true,
+          },
+        },
+      },
+    });
+
+    return comments;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
+const getCachedTweet = nextCache(getTweet, ["post-detail"], {
+  tags: ["post-detail"],
+  revalidate: 60,
+});
+
+async function getLikeStatus(tweetId: number, userId: number) {
+  const isLiked = await db.like.findUnique({
+    where: {
+      id: {
+        tweetId,
+        userId,
+      },
+    },
+  });
+  const likeCount = await db.like.count({
+    where: {
+      tweetId,
+    },
+  });
+
+  return {
+    likeCount,
+    isLiked: Boolean(isLiked),
+  };
+}
+
+async function getUsername() {
+  const session = await getSession();
+
+  const user = await db.user.findUnique({
+    where: {
+      id: session.id!,
+    },
+  });
+
+  return user?.username;
+}
+
+export type InitalComments = Prisma.PromiseReturnType<typeof getComments>;
+
+async function getCachedLikeStatus(tweetId: number) {
+  const session = await getSession();
+  const cachedOperation = nextCache(getLikeStatus, ["tweet-like-status"], {
+    tags: [`like-status-${tweetId}`],
+  });
+
+  return cachedOperation(tweetId, session.id!);
+}
+
+async function getCachedComment(tweetId: number) {
+  const cachedOperation = nextCache(getComments, ["tweet-comment-status"], {
+    tags: [`comment-status-${tweetId}`],
+  });
+
+  return cachedOperation(tweetId);
+}
+
 export default async function TweetDetailPage({ params }: TweetDetailProps) {
-  const tweet = await getTweet(Number(params.id));
+  const { id } = await params;
+  const tweetId = Number(id);
+  const tweet = await getCachedTweet(tweetId);
+  const username = await getUsername();
+
+  if (!tweet || !username) return notFound();
+
+  const { likeCount, isLiked } = await getCachedLikeStatus(tweetId);
+  const comments = await getCachedComment(tweetId);
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-4 flex items-center space-x-4">
-        <Link
-          href="/"
-          className="hover:bg-gray-100 rounded-full p-2 transition-colors"
-        >
-          <ArrowLeftIcon className="h-6 w-6 text-gray-700" />
-        </Link>
-        <h1 className="text-xl font-bold text-gray-900">트윗</h1>
-      </div>
+      <Header title={"트윗"} returnPath="/" />
       <div className="p-4">
         <div className="flex items-start space-x-3 mb-4">
           <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
@@ -56,12 +146,9 @@ export default async function TweetDetailPage({ params }: TweetDetailProps) {
                 {tweet.user.username}
               </span>
               <span className="text-gray-500 text-sm">
-                · {formatToTimeAgo(tweet.create_at.toISOString())}
+                · {formatToTimeAgo(tweet.create_at.toString())}
               </span>
             </div>
-            {tweet.user.bio && (
-              <p className="text-gray-600 text-sm mb-2">{tweet.user.bio}</p>
-            )}
           </div>
         </div>
         <div className="mb-4">
@@ -70,22 +157,25 @@ export default async function TweetDetailPage({ params }: TweetDetailProps) {
           </p>
         </div>
         <div className="text-gray-500 text-sm mb-4">
-          {formatToTimeAgo(tweet.create_at.toISOString())}
+          {formatToTimeAgo(tweet.create_at.toString())}
         </div>
         <div className="border-t border-b border-gray-200 py-3 flex justify-around">
           <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
             <ChatBubbleLeftIcon className="h-5 w-5" />
-            <span>0</span>
+            <span>{comments.length}</span>
           </button>
-          <button className="flex items-center space-x-2 text-gray-500 hover:text-red-500 transition-colors">
-            <HeartIcon className="h-5 w-5" />
-            <span>0</span>
-          </button>
+          <LikeButton
+            isLiked={isLiked}
+            likeCount={likeCount}
+            tweetId={tweetId}
+          />
         </div>
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">댓글</h2>
-          <p className="text-gray-500 text-center">아직 댓글이 없습니다.</p>
-        </div>
+        <CommentList
+          initialComments={comments}
+          tweetId={tweet.id}
+          username={username}
+          tweetUsername={tweet.user.username}
+        />
       </div>
     </div>
   );
