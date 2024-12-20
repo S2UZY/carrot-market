@@ -11,6 +11,9 @@ import {
   UserIcon,
 } from "@heroicons/react/16/solid";
 
+import { Line } from "@/components/line";
+import { SocialLogin } from "@/components/social-login";
+
 export default function LogIn() {
   const [state, action] = useActionState(logIn, null);
 
@@ -44,6 +47,8 @@ export default function LogIn() {
         />
         <FormButton text="Log in" />
       </form>
+      <Line />
+      <SocialLogin provider="github" />
     </div>
   );
 }
