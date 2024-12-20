@@ -26,13 +26,7 @@ const getUserId = async (email: string) => {
 
 const formSchema = z
   .object({
-    email: z
-      .string()
-      .email()
-      .refine(
-        (email) => email.includes("@zod.com"),
-        "Only @zod.com emails are allowed."
-      ),
+    email: z.string().email(),
     username: z
       .string()
       .min(
